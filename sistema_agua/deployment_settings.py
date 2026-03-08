@@ -37,7 +37,7 @@ STORAGES = {
 
 DATABASES = {
     'default': dj_database_url.config(
-        default='postgresql://postgres:postgres@localhost:5432/Waterflow',
+        default= os.environ['DATABASE_URL'],
         conn_max_age=600
     )
 }
