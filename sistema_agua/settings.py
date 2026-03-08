@@ -82,26 +82,25 @@ TEMPLATES = [
 WSGI_APPLICATION = 'sistema_agua.wsgi.application'
 
 
-DATABASES = {
-    'default': dj_database_url.config(
-        default='postgresql://postgres:postgres@localhost:5432/mysite',
-        conn_max_age=600
-    )
-}
+#DATABASES = {
+ #   'default': dj_database_url.config(
+ #       default='postgresql://postgres:postgres@localhost:5432/mysite',
+ #       conn_max_age=600
+ #   )
+#}
 
 DATABASES = {
-
-    'default': {
+      'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'sistema_agua',
         'USER': 'root',
         'PASSWORD': '123456789',
         'HOST': '127.0.0.1',
-        'PORT': '3306',
+       'PORT': '3306',
         'OPTIONS': {
             'autocommit': True,
         },
-    },
+    }
 }
 
 
