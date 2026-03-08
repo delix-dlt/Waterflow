@@ -4,7 +4,7 @@ import os
 import sys
 
 if __name__ == "__main__":
-    settings_module = 'api.deployment_settings' if 'RENDER_EXTERNAL_HOSTNAME' in os.environ else 'sistema_agua.settings'
+    settings_module = 'sistema_agua.deployment_settings' if 'RENDER_EXTERNAL_HOSTNAME' in os.environ else 'sistema_agua.settings'
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', settings_module)
 
     try:
