@@ -13,7 +13,7 @@ class LeituraSerializer(serializers.ModelSerializer):
         read_only_fields = ['id','created_at','device','contador']
 
     def validate(self, data):
-        # volume obrigatório e >= 0
+        # volume obrigatÃ³rio e >= 0
         vol = data.get('volume')
         if vol is None:
             raise serializers.ValidationError({'volume': 'This field is required.'})
@@ -21,7 +21,7 @@ class LeituraSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({'volume': 'Must be >= 0.'})
         # precisa contar id ou serial
         if not data.get('contador') and not data.get('contador_serial'):
-            # note: 'contador' normalmente não vem do JSON
+            # note: 'contador' normalmente nÃ£o vem do JSON
             return data
         return data
 
@@ -37,5 +37,5 @@ class LeituraSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         if request and hasattr(request, 'device'):
             validated_data['device'] = request.device
-        # captured_at uso -> se None ficará null no BD (ou usa now())
+        # captured_at uso -> se None ficarÃ¡ null no BD (ou usa now())
         return super().create(validated_data)
