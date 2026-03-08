@@ -18,8 +18,10 @@ class LeituraViewSet(viewsets.ModelViewSet):
         return qs
 
     def create(self, request, *args, **kwargs):
-        # delega validação e criação no serializer
+        # delega validaÃ§Ã£o e criaÃ§Ã£o no serializer
         serializer = self.get_serializer(data=request.data, context={'request': request})
         serializer.is_valid(raise_exception=True)
         leitura = serializer.save()
         return Response(self.get_serializer(leitura).data, status=status.HTTP_201_CREATED)
+
+

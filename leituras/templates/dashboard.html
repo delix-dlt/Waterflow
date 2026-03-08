@@ -1,0 +1,272 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Sistema de Monitorização de Água | FIPAG</title>
+    <!-- Removido o Chart.js -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --info: #3498db;
+            --warning: #f39c12;
+            --purple: #9b59b6;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+            min-height: 100vh;
+        }
+        .container { max-width: 1300px; margin: 0 auto; padding: 20px; }
+
+        .header {
+            background: var(--primary);
+            color: white;
+            padding: 25px;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(44, 62, 80, 0.3);
+            margin-bottom: 30px;
+        }
+        .header h1 { font-size: 2.2rem; margin-bottom: 8px; }
+        .header a { color: #a8e6cf; text-decoration: none; font-weight: 500; }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+        .box {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+        .box:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
+        .box i { font-size: 3.5rem; margin-bottom: 15px; }
+        .box h3 { font-size: 2.2rem; margin: 10px 0; font-weight: 700; }
+        .box p { opacity: 0.8; }
+
+        .box.green { background: linear-gradient(135deg, #27ae60, #2ecc71); color: white; }
+        .box.red { background: linear-gradient(135deg, #e74c3c, #c0392b); color: white; }
+        .box.blue { background: linear-gradient(135deg, #2980b9, #3498db); color: white; }
+        .box.purple { background: linear-gradient(135deg, #8e44ad, #9b59b6); color: white; }
+        .box.orange { background: linear-gradient(135deg, #e67e22, #f39c12); color: white; }
+
+        .contador-select {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.9);
+            font-size: 1.1rem;
+            margin: 15px 0;
+            cursor: pointer;
+        }
+
+        .btn-historico {
+            display: block;
+            margin: 40px auto;
+            padding: 18px 40px;
+            background: linear-gradient(135deg, #8e44ad, #9b59b6);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(142, 68, 173, 0.4);
+            transition: all 0.3s;
+        }
+        .btn-historico:hover { transform: translateY(-3px); }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0; top: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: white;
+            margin: auto;
+            padding: 40px;
+            width: 90%;
+            max-width: 1000px;
+            border-radius: 20px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 25px;
+            color: #aaa;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close:hover { color: #e74c3c; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        th { background: var(--primary); color: white; padding: 18px; text-align: center; }
+        td { padding: 16px; text-align: center; border-bottom: 1px solid #eee; }
+        tr:hover { background: #f8f9fa; }
+
+        .filtro-ano {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .filtro-ano select {
+            padding: 10px 15px;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>Sistema de Monitorização de Água - FIPAG</h1>
+        <p>Bem-vindo, <strong>{{ user.get_full_name|default:user.username|upper }}</strong> | 
+           <a href="{% url 'logout' %}">Sair</a></p>
+    </div>
+
+    {% if no_device %}
+        <div style="text-align:center; padding:60px; background:white; border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,0.1); margin: 50px 0;">
+            <h2>Nenhum contador associado</h2>
+            <p>Contacte o administrador da FIPAG.</p>
+        </div>
+    {% else %}
+        <div class="grid">
+            <div class="box green">
+                <i class="fas fa-microchip"></i>
+                <h3>Contador</h3>
+                <form method="get">
+                    <select name="contador" class="contador-select" onchange="this.form.submit()">
+                        {% for c in contadores %}
+                            <option value="{{ c.id }}" {% if c.id == contador_atual.id %}selected{% endif %}>{{ c.serial }}</option>
+                        {% endfor %}
+                    </select>
+                </form>
+                <small>ID: {{ contador_atual.serial }}</small>
+            </div>
+
+            <div class="box red">
+                <i class="fas fa-cube"></i>
+                <h3>{{ total_mes }} m³</h3>
+                <p>Consumo este mês</p>
+            </div>
+
+            <div class="box blue">
+                <i class="fas fa-water"></i>
+                <h3>{{ total_geral }} m³</h3>
+                <p>Total acumulado</p>
+            </div>
+
+            <div class="box purple">
+                <i class="fas fa-calendar-alt"></i>
+                <h3>{{ mes_atual }}</h3>
+                <p>Mês atual</p>
+            </div>
+
+            {% if ultima_leitura %}
+            <div class="box orange">
+                <i class="fas fa-clock"></i>
+                <h3>{{ ultima_leitura.captured_at|date:"d/m/Y H:i" }}</h3>
+                <p>Última leitura</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <div style="text-align:center;">
+            <button class="btn-historico" onclick="document.getElementById('historicoModal').style.display='flex'">
+                Ver Histórico Completo
+            </button>
+        </div>
+    {% endif %}
+</div>
+
+<!-- MODAL HISTÓRICO (mantido 100% funcional) -->
+<div id="historicoModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="document.getElementById('historicoModal').style.display='none'">×</span>
+        <h2 style="text-align:center;">Histórico Completo - {{ contador_atual.serial }}</h2>
+
+        <div class="filtro-ano">
+            <label><strong>Filtrar por ano:</strong></label>
+            <select id="filtroAno" onchange="filtrarAno()">
+                <option value="">Todos os anos</option>
+                {% for ano in anos_disponiveis %}
+                    <option value="{{ ano }}">{{ ano }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Mês</th>
+                    <th>Consumo (m³)</th>
+                </tr>
+            </thead>
+            <tbody id="tabelaHistorico">
+                {% for h in historico_mensal %}
+                <tr data-ano="{{ h.ano }}">
+                    <td>{{ h.mes }}</td>
+                    <td>{{ h.total }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // Apenas o filtro do histórico (gráfico removido)
+    function filtrarAno() {
+        const anoSelecionado = document.getElementById('filtroAno').value;
+        const linhas = document.querySelectorAll('#tabelaHistorico tr');
+
+        linhas.forEach(linha => {
+            const anoLinha = linha.getAttribute('data-ano');
+            if (anoSelecionado === '' || anoLinha === anoSelecionado) {
+                linha.style.display = '';
+            } else {
+                linha.style.display = 'none';
+            }
+        });
+    }
+
+    // Fechar modal clicando fora
+    window.onclick = function(event) {
+        const modal = document.getElementById('historicoModal');
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    }
+</script>
+</body>
+</html>

@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 import os
+import dj_database_url
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -22,9 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'troca_esta_chave_em_producao')
 
-DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'False'
+DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['*']  # ajustar em produÁ„o
+ALLOWED_HOSTS = ['*']  # ajustar em produ√ß√£o
 
 
 
@@ -58,7 +59,7 @@ MIDDLEWARE = [
 
 ]
 
-CORS_ALLOW_ALL_ORIGINS = True  # sÛ em dev. Em produÁ„o define frontends especÌficos.
+CORS_ALLOW_ALL_ORIGINS = True  # s√≥ em dev. Em produ√ß√£o define frontends espec√≠ficos.
 
 ROOT_URLCONF = 'sistema_agua.urls'
 
@@ -81,9 +82,15 @@ TEMPLATES = [
 WSGI_APPLICATION = 'sistema_agua.wsgi.application'
 
 
-
+DATABASES = {
+    'default': dj_database_url.config(
+        default='postgresql://postgres:postgres@localhost:5432/mysite',
+        conn_max_age=600
+    )
+}
 
 DATABASES = {
+
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'sistema_agua',
@@ -128,9 +135,6 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = '/static/'
-
-
-
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -152,3 +156,8 @@ REST_FRAMEWORK = {
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+LOGIN_URL = '/login/'  # Usa o login do admin que j√° existe
+LOGIN_REDIRECT_URL = '/'  # Para onde redirecionar ap√≥s login bem-sucedido
+LOGOUT_REDIRECT_URL = '/login/'  # Para onde redirecionar ap√≥s logout

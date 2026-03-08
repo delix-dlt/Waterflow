@@ -1,0 +1,155 @@
+<!-- templates/register_user.html (ou onde preferires) -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registar Cliente</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+<div class="container mt-5">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h4>Registo de Novo Cliente</h4>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label>Nome Completo</label>
+                        {{ form.nome_completo }}
+                    </div>
+                    <div class="col-md-6">
+                        <label>Telefone</label>
+                        {{ form.telefone }}
+                    </div>
+
+                    <div class="col-md-3">
+                        <label>Província</label>
+                        {{ form.provincia }}
+                    </div>
+                    <div class="col-md-3">
+                        <label>Cidade / Distrito</label>
+                        {{ form.cidade }}
+                    </div>
+                    <div class="col-md-3">
+                        <label>Bairro</label>
+                        {{ form.bairro }}
+                    </div>
+                    <div class="col-md-3">
+                        <label>Caixa Postal (opcional)</label>
+                        {{ form.caixa_postal }}
+                    </div>
+                </div>
+
+                <div class="mt-4 text-end">
+                    <button type="submit" class="btn btn-success btn-lg">Registar Cliente</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- DADOS DAS LOCALIZAÇÕES (JavaScript) -->
+<script>
+// Base de dados local (podes depois migrar para JSON ou API se quiseres)
+const localidades = {
+    "Maputo Cidade": {
+        cidades: ["Maputo"],
+        bairros: {
+            "Maputo": ["Polana", "Sommerchield", "Central", "Alto Maé", "Malhangalene", "Mavalane", "Hulene", "Chamanculo", "Xipamanine", "Mafalala", "Urbanização", "Costa do Sol", "Triunfo", "Infulene"]
+        }
+    },
+    "Maputo Província": {
+        cidades: ["Matola", "Boane", "Marracuene", "Manhiça", "Magude", "Moamba", "Namaacha"],
+        bairros: {
+            "Matola": ["Matola A", "Matola B", "Matola C", "Machava", "Infulene", "Tsalala", "Kmhkm", "Fomento", "Liberdade"],
+            "Boane": ["Boane Sede", "Mahubo", "Pessene"],
+            "Marracuene": ["Marracuene Sede", "Macia"],
+            "Manhiça": ["Manhiça Sede", "Maluana", "3 de Fevereiro"],
+            "Magude": ["Magude Sede", "Motaze", "Panjaluna"],
+            "Moamba": ["Moamba Sede", "Pessene"],
+            "Namaacha": ["Namaacha Sede"]
+        }
+    },
+    "Gaza": {
+        cidades: ["Xai-Xai", "Chókwè", "Macia", "Bilene", "Chibuto", "Manjacaze"],
+        bairros: {
+            "Xai-Xai": ["Bairro 1", "Bairro 2", "Patrice Lumumba", "Inhamissa", "Nwachicoluane"],
+            "Chókwè": ["Bairro 1", "Bairro 2", "Macarretane", "Lionde"],
+            "Macia": ["Macia Sede", "Chissano", "Chalucuane"]
+        }
+    },
+    "Inhambane": {
+        cidades: ["Inhambane Cidade", "Maxixe", "Massinga", "Morrumbene", "Jangamo", "Vilankulo"],
+        bairros: {
+            "Inhambane Cidade": ["Josina Machel", "7 de Abril", "Muelé", "Gulamo"],
+            "Maxixe": ["Bairro Central", "Macuamene", "Mabote"],
+            "Vilankulo": ["Vilankulo Sede", "Chibuene"]
+        }
+    },
+    "Sofala": {
+        cidades: ["Beira", "Dondo", "Chimoio", "Nhamatanda"],
+        bairros: {
+            "Beira": ["Macuti", "Ponta Gêa", "Chaimite", "Munhava", "Estoril", "Mafine", "Vila Massane"]
+        }
+    },
+    "Manica": {
+        cidades: ["Chimoio", "Gondola", "Manica", "Sussundenga"],
+        bairros: {
+            "Chimoio": ["Bairro 1", "Bairro 4", "Bairro 5", "Cimento", "Chimanimani", "Nhamaonha"]
+        }
+    },
+    "Zambézia": {
+        cidades: ["Quelimane", "Nicoadala", "Mocuba", "Gurúè"],
+        bairros: {
+            "Quelimane": ["Icídua", "Nalázia", "Sangarivera", "Coalane", "Inhangome"]
+        }
+    },
+    "Nampula": {
+        cidades: ["Nampula Cidade", "Nacala", "Ilha de Moçambique", "Angoche", "Mossuril"],
+        bairros: {
+            "Nampula Cidade": ["Muahivire", "Namarroi", "Napipine", "Murrapaniua", "Central"]
+        }
+    }
+};
+
+document.getElementById('id_provincia').addEventListener('change', function() {
+    const prov = this.value;
+    const cidadeSelect = document.getElementById('id_cidade');
+    const bairroSelect = document.getElementById('id_bairro');
+
+    // Limpa
+    cidadeSelect.innerHTML = '<option value="">Selecione a Cidade</option>';
+    bairroSelect.innerHTML = '<option value="">Selecione o Bairro</option>';
+    bairroSelect.disabled = true;
+
+    if (!prov || !localidades[prov]) return;
+
+    // Preenche cidades
+    localidades[prov].cidades.forEach(cidade => {
+        cidadeSelect.innerHTML += `<option value="${cidade}">${cidade}</option>`;
+    });
+    cidadeSelect.disabled = false;
+});
+
+document.getElementById('id_cidade').addEventListener('change', function() {
+    const prov = document.getElementById('id_provincia').value;
+    const cidade = this.value;
+    const bairroSelect = document.getElementById('id_bairro');
+
+    bairroSelect.innerHTML = '<option value="">Selecione o Bairro</option>';
+
+    if (!cidade || !localidades[prov]?.bairros[cidade]) return;
+
+    localidades[prov].bairros[cidade].forEach(bairro => {
+        bairroSelect.innerHTML += `<option value="${bairro}">${bairro}</option>`;
+    });
+    bairroSelect.disabled = false;
+});
+</script>
+</body>
+</html>
