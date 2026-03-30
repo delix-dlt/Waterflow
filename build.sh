@@ -8,5 +8,4 @@ python manage.py migrate leituras --fake
 
 python manage.py migrate
 
-python manage.py createsuperuser --no-input
 
