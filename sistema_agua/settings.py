@@ -81,6 +81,16 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'sistema_agua.wsgi.application'
 
+# CSRF Settings (Very Important for Render)
+CSRF_TRUSTED_ORIGINS = [
+    'https://waterflow-wpyh.onrender.com',
+    'https://*.onrender.com',
+]
+
+# For ASGI / Uvicorn (recommended)
+CSRF_COOKIE_SECURE = False      # Set True only when you have HTTPS + custom domain
+SESSION_COOKIE_SECURE = False   # Same
+
 
 #DATABASES = {
  #   'default': dj_database_url.config(
